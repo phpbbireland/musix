@@ -19,3 +19,4 @@ Main Menu Options:
 + Tools: (a few extra tools)
 
 Setup: Searches a given directory for your music and builds the database automatically (reads track tags)...
+!(Image)[https://github.com/phpbbireland/musix/blob/main/player1.jpg]
