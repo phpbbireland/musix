@@ -1,0 +1,414 @@
+/* Musix — minimal, dark-friendly UI.
+ *
+ * Theming: every chrome colour goes through a CSS custom property here so
+ * the light theme can override the lot with one selector. The inline
+ * script in header.php applies the user's chosen mode to <html> as a
+ * data-theme attribute before first paint — that prevents the "flash of
+ * wrong theme" on page navigation. Three modes:
+ *   - auto (no cookie): inline script honours prefers-color-scheme.
+ *   - light: data-theme="light" → the override block below kicks in.
+ *   - dark:  data-theme="dark"  → no overrides; :root values win.
+ */
+:root {
+    --bg: #14171c;
+    --panel: #1d2128;
+    --panel-2: #262b34;
+    --border: #2f3540;
+    --text: #e6e8ec;
+    --muted: #8a93a3;
+    --accent: #4f8cff;
+    --accent-2: #2c6ad6;
+    --ok: #3fb87f;
+    --err: #e26464;
+}
+
+[data-theme="light"] {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --panel-2: #eef0f4;
+    --border: #d9dde3;
+    --text: #1a1d24;
+    --muted: #5d6776;
+    --accent: #2c6ad6;
+    --accent-2: #1f4fa0;
+    --ok: #2e9e6a;
+    --err: #c63b3b;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 24px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+.topbar .brand a {
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.5px;
+}
+.topbar nav { display: flex; gap: 16px; }
+.topbar nav a {
+    color: var(--muted);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.topbar nav a.active,
+.topbar nav a:hover { color: var(--text); background: var(--panel-2); text-decoration: none; }
+
+.topbar-search { margin-left: auto; }
+.topbar-search input[type=text] {
+    width: 240px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.container {
+    max-width: 80%;
+    margin: 24px auto;
+    padding: 0 24px 64px;
+}
+
+h1 { margin: 0 0 16px; font-size: 22px; }
+h2 { margin: 24px 0 12px; font-size: 18px; color: var(--muted); font-weight: 600; }
+
+.muted { color: var(--muted); }
+.ok    { color: var(--ok); }
+.err   { color: var(--err); }
+
+.crumbs { color: var(--muted); margin-bottom: 14px; font-size: 13px; }
+.crumbs a { color: var(--muted); }
+.crumbs a:hover { color: var(--text); }
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+th { background: var(--panel-2); color: var(--muted); font-weight: 600; font-size: 13px; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--panel-2); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.actions { white-space: nowrap; }
+th.fav, td.fav { width: 28px; padding-left: 6px; padding-right: 6px; text-align: center; }
+
+/* Format badge after the track title — e.g. MP3, FLAC, OGG.
+ * .ext-warn flags formats the browser likely won't stream natively. */
+.ext {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    background: var(--panel-2);
+    vertical-align: middle;
+}
+.ext-warn {
+    color: #d6a855;
+    border-color: #6a4f1f;
+    background: rgba(214, 168, 85, 0.10);
+}
+[data-theme="light"] .ext-warn {
+    color: #8a5a10;
+    border-color: #d6a855;
+    background: rgba(214, 168, 85, 0.18);
+}
+
+/* Bitrate kbps badge — same shape as .ext, slightly dimmer so the format
+ * badge stays the louder marker in the row. Tooltip carries "N kbps • Genre". */
+.bitrate {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    background: transparent;
+    vertical-align: middle;
+}
+
+/* Favourite star toggle. Hollow ☆ when off, filled ★ + accent when on. */
+.fav-btn {
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    padding: 2px 4px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s, transform 0.1s;
+}
+.fav-btn:hover { color: var(--text); background: transparent; }
+.fav-btn:active { transform: scale(0.92); }
+.fav-btn.is-fav { color: #e8b94a; }
+.fav-btn.is-fav:hover { color: #ffd166; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+}
+.tile {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    transition: background 0.15s;
+}
+.tile:hover { background: var(--panel-2); }
+.tile a.title {
+    color: var(--text);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+.tile .sub { color: var(--muted); font-size: 13px; }
+
+/* Album cover thumbnails on the grid + the placeholder for albums with no art */
+.tile a.cover-link { display: block; margin: -12px -12px 10px; }
+.cover {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+}
+.cover-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2a3140 0%, #1a1f29 100%);
+    color: var(--muted);
+    font-size: 56px;
+    line-height: 1;
+    user-select: none;
+}
+[data-theme="light"] .cover-placeholder {
+    background: linear-gradient(135deg, #e4e8ef 0%, #ced4de 100%);
+}
+
+/* Albums overview page (albums.php with no params) — every album in the
+ * library, grouped by artist. Each artist gets a thin header followed by a
+ * flex-wrap row of thumbnails. Tile sizing is smaller than the .tile grid
+ * so a typical artist's discography fits on one or two rows. */
+.artist-group { margin: 0 0 28px; }
+.artist-heading {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 600;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+.artist-heading a { color: var(--text); }
+.artist-heading a:hover { color: var(--accent); text-decoration: none; }
+.artist-heading .muted { font-weight: 400; font-size: 13px; }
+
+.album-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.album-thumb {
+    width: 140px;
+    display: block;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background 0.15s;
+}
+.album-thumb:hover { background: var(--panel-2); text-decoration: none; }
+.album-thumb .cover {
+    width: 140px;
+    height: 140px;
+    aspect-ratio: 1 / 1;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+}
+.album-thumb .cover-placeholder { font-size: 42px; }
+.album-thumb-name {
+    padding: 6px 8px 2px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.25;
+    /* Two-line clamp so a long album title doesn't tower over the thumbnail. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+.album-thumb-meta {
+    padding: 0 8px 6px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* Bigger version on the tracks page */
+.album-header {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.album-header .cover-lg {
+    width: 180px;
+    height: 180px;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex: 0 0 auto;
+}
+.album-header .cover-lg.cover-placeholder { font-size: 72px; }
+.album-header .album-meta { flex: 1 1 240px; min-width: 0; }
+.album-header .album-meta h1 { margin-top: 0; }
+
+button, .btn, input[type=submit] {
+    background: var(--accent);
+    color: white;
+    border: 0;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font: inherit;
+    cursor: pointer;
+}
+button:hover, .btn:hover, input[type=submit]:hover { background: var(--accent-2); }
+.btn.ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+.btn.ghost:hover { background: var(--panel-2); }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+
+input[type=text], input[type=number], input[type=password], select, textarea {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font: inherit;
+    width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+    outline: 0;
+    border-color: var(--accent);
+}
+
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; color: var(--muted); margin-bottom: 6px; font-size: 13px; }
+.form-row .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+.notice { padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; }
+.notice.ok  { background: rgba(63,184,127,0.15); color: var(--ok); border: 1px solid rgba(63,184,127,0.4); }
+.notice.err { background: rgba(226,100,100,0.15); color: var(--err); border: 1px solid rgba(226,100,100,0.4); }
+
+.toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.toolbar .spacer { flex: 1; }
+
+/* Playlist picker dialog (used on tracks.php). */
+dialog.pl-dialog {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 320px;
+    max-width: 480px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+}
+dialog.pl-dialog::backdrop { background: rgba(0,0,0,0.5); }
+[data-theme="light"] dialog.pl-dialog::backdrop { background: rgba(20,25,35,0.35); }
+
+/* Theme toggle button in the topbar. Cycles auto → light → dark → auto.
+ * The current mode is shown by its glyph and announced via aria-label. */
+.theme-toggle {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin-left: 12px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+.theme-toggle:hover { color: var(--text); background: var(--panel-2); }
+dialog.pl-dialog label { display: block; color: var(--muted); margin: 4px 0 6px; font-size: 13px; }
+
+pre {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+audio {
+    width: 100%;
+    margin-top: 12px;
+    /* Cheap dark-theme hack: invert the browser's default (light) audio
+     * control so it doesn't blast white in a dark page. Light mode cancels
+     * this so the native control renders as-is. */
+    filter: invert(0.92) hue-rotate(180deg);
+}
+[data-theme="light"] audio {
+    filter: none;
+}
+
+.now-playing {
+    position: sticky;
+    bottom: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 24px;
+}
+.now-playing .np-title { font-weight: 600; margin-bottom: 6px; }
+.now-playing .np-sub { color: var(--muted); font-size: 13px; }
