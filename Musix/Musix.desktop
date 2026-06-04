@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Musix
+GenericName=Music Library
+Comment=Browse and play your music library
+Exec=/home/Mike/Music/Musix/start-musix.sh
+Path=/home/Mike/Music/Musix
+Icon=multimedia-player
+Terminal=true
+Categories=AudioVideo;Audio;Player;
+Keywords=music;audio;player;library;albums;
+StartupNotify=true
