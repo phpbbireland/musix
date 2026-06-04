@@ -1,11 +1,12 @@
 # musix
 1 Local Web Based Music Player Full Stack (Apache/MySQL/php)  
-2 Local Web Based Music Player (requires php)  
-3 Independant Music Player (required php)  
+2 Local Web Based Music Player (requires php only)  
+3 Independant Music Player (required php only)  
 
-Searches you Music folder for all mp3/ogg/flac etc...
+Automatically searches you music including mp3/ogg/flac etc...  
+See config page for settings...  
 
-Supports Album Art  
+Supports Album Art image or embedded...
 
 Main Menu Options:
 + Musix: About Page
