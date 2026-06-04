@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Capability for the Musix window. The Musix app is plain server-rendered PHP and does not call any Tauri JavaScript APIs, so only the core defaults are granted.","local":true,"windows":["main"],"permissions":["core:default"]}}
