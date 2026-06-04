@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Musix</title>
+  <style>
+    html, body {
+      height: 100%; margin: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: system-ui, sans-serif;
+      background: #16161a; color: #e8e8ec;
+    }
+    .splash { text-align: center; }
+    .splash h1 { font-weight: 600; letter-spacing: 0.5px; }
+    .splash p { color: #9a9aa6; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <!--
+    This page exists only to satisfy Tauri's bundler, which requires a
+    `frontendDist` folder. The real Musix window is created at runtime by
+    src-tauri/src/main.rs and points straight at the local PHP server, so
+    this HTML is normally never shown. It doubles as a fallback splash.
+  -->
+  <div class="splash">
+    <h1>Musix</h1>
+    <p>Starting the music library&hellip;</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+npm run build
+
+
+
+Other: ?   ./start-musix.sh
+
+
+
+Two new files for the "cheapest path" wrapper
+start-musix.sh — picks XAMPP's PHP (/opt/lampp/bin/php) for PDO-MySQL parity, checks MariaDB is up (offers to start it), finds a free port from 8675, runs PHP's built-in server, and opens Musix in your default browser. Closing the window or Ctrl+C stops it.
+Musix.desktop — an applications-menu entry that runs the launcher in a terminal window.
+
+
+
+In browser before setting independant...
+http://127.0.0.1:8675/tracks.php?album_id=1386
